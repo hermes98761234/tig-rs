@@ -1,3 +1,4 @@
+pub mod diff;
 pub mod main_view;
 pub mod pager;
 

@@ -105,9 +105,11 @@ impl View for MainView {
         }
         match key.code {
             KeyCode::Char('R') => Ok(ViewAction::Refresh),
-            KeyCode::Enter => {
-                // Diff view arrives in Task 7. For now: no-op.
-                let _ = self.selected_commit();
+            KeyCode::Enter | KeyCode::Char('d') => {
+                if let Some(c) = self.selected_commit() {
+                    let v = crate::views::diff::commit_diff_view(&c.id)?;
+                    return Ok(ViewAction::Push(v));
+                }
                 Ok(ViewAction::None)
             }
             _ => Ok(ViewAction::None),

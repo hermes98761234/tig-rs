@@ -44,3 +44,26 @@ fn live_refs_status_tree() {
         .iter()
         .any(|t| t.name == "README.md" && t.kind == parse::TreeEntryKind::Blob));
 }
+
+#[test]
+fn git_show_produces_patch_text() {
+    let repo = TestRepo::new();
+    repo.commit_file("a.txt", "one\n", "first");
+    repo.commit_file("a.txt", "one\ntwo\n", "second");
+    let head = git::run_git_in(repo.path(), &["rev-parse", "HEAD"]).unwrap();
+    let raw = git::run_git_in(
+        repo.path(),
+        &[
+            "show",
+            "--stat",
+            "--patch",
+            "--format=fuller",
+            "--decorate",
+            head.trim(),
+        ],
+    )
+    .unwrap();
+    assert!(raw.contains("commit "));
+    assert!(raw.contains("+two"));
+    assert!(raw.contains("a.txt"));
+}
