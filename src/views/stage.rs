@@ -123,4 +123,8 @@ impl View for StageView {
     fn select_line(&mut self, idx: usize) {
         self.nav.selected = idx.min(self.lines.len().saturating_sub(1));
     }
+
+    fn selected_index(&self) -> usize {
+        self.nav.selected
+    }
 }

@@ -1,4 +1,5 @@
 pub mod diff;
+pub mod help;
 pub mod main_view;
 pub mod pager;
 pub mod refs;
@@ -33,6 +34,10 @@ pub trait View {
     }
     /// Jump selection/scroll to line `idx` (search match). Default: ignore.
     fn select_line(&mut self, _idx: usize) {}
+    /// Currently selected line index (for search start). Default 0.
+    fn selected_index(&self) -> usize {
+        0
+    }
 }
 
 /// Standard movement keys shared by all list-like views.

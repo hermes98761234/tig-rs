@@ -213,4 +213,8 @@ impl View for StatusView {
     fn select_line(&mut self, idx: usize) {
         self.nav.selected = idx.min(self.rows.len().saturating_sub(1));
     }
+
+    fn selected_index(&self) -> usize {
+        self.nav.selected
+    }
 }
