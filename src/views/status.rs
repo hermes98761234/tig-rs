@@ -189,6 +189,13 @@ impl View for StatusView {
                 }
                 Ok(ViewAction::None)
             }
+            KeyCode::Enter => {
+                if let Some((section, e)) = self.selected_file() {
+                    let v = crate::views::stage::StageView::new(section, &e.path)?;
+                    return Ok(ViewAction::Push(Box::new(v)));
+                }
+                Ok(ViewAction::None)
+            }
             _ => Ok(ViewAction::None),
         }
     }

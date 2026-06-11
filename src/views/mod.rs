@@ -2,6 +2,7 @@ pub mod diff;
 pub mod main_view;
 pub mod pager;
 pub mod refs;
+pub mod stage;
 pub mod status;
 pub mod tree;
 

@@ -211,6 +211,39 @@ pub fn parse_tree(raw: &str) -> Vec<TreeEntry> {
         .collect()
 }
 
+/// Given full `git diff` output for ONE file and a 0-based line index into
+/// it, return a minimal patch containing the file header and only the hunk
+/// containing that line. Returns None if the line is not inside a hunk.
+pub fn extract_hunk(diff: &str, line_idx: usize) -> Option<String> {
+    let lines: Vec<&str> = diff.lines().collect();
+    if line_idx >= lines.len() {
+        return None;
+    }
+    // Header: everything before the first "@@".
+    let first_hunk = lines.iter().position(|l| l.starts_with("@@"))?;
+    if line_idx < first_hunk {
+        return None;
+    }
+    // Find the start of the hunk containing line_idx.
+    let start = (0..=line_idx).rev().find(|&i| lines[i].starts_with("@@"))?;
+    // Hunk ends at the next "@@" line or "diff --git" line or EOF.
+    let end = lines[start + 1..]
+        .iter()
+        .position(|l| l.starts_with("@@") || l.starts_with("diff --git"))
+        .map(|p| start + 1 + p)
+        .unwrap_or(lines.len());
+    let mut patch = String::new();
+    for l in &lines[..first_hunk] {
+        patch.push_str(l);
+        patch.push('\n');
+    }
+    for l in &lines[start..end] {
+        patch.push_str(l);
+        patch.push('\n');
+    }
+    Some(patch)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -301,5 +334,46 @@ mod tests {
         assert_eq!(entries[1].name, "src");
         assert_eq!(entries[2].name, "link name");
         assert_eq!(entries[0].mode, "100644");
+    }
+
+    const TWO_HUNK_DIFF: &str = "\
+diff --git a/f.txt b/f.txt
+index 0000000..1111111 100644
+--- a/f.txt
++++ b/f.txt
+@@ -1,3 +1,4 @@
+ line1
++added-in-hunk-1
+ line2
+ line3
+@@ -10,3 +11,4 @@
+ line10
++added-in-hunk-2
+ line11
+ line12
+";
+
+    #[test]
+    fn extract_first_hunk() {
+        // Line index 6 = "+added-in-hunk-1" (0-based, counting from "diff --git").
+        let patch = extract_hunk(TWO_HUNK_DIFF, 6).unwrap();
+        assert!(patch.contains("+added-in-hunk-1"));
+        assert!(!patch.contains("hunk-2"));
+        assert!(patch.starts_with("diff --git"));
+        assert!(patch.contains("+++ b/f.txt"));
+    }
+
+    #[test]
+    fn extract_second_hunk() {
+        let patch = extract_hunk(TWO_HUNK_DIFF, 11).unwrap();
+        assert!(patch.contains("+added-in-hunk-2"));
+        assert!(!patch.contains("hunk-1"));
+    }
+
+    #[test]
+    fn header_lines_are_not_in_a_hunk() {
+        assert!(extract_hunk(TWO_HUNK_DIFF, 0).is_none());
+        assert!(extract_hunk(TWO_HUNK_DIFF, 3).is_none());
+        assert!(extract_hunk("not a diff", 0).is_none());
     }
 }

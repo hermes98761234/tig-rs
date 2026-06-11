@@ -46,6 +46,9 @@ impl App {
                     if self.views.is_empty() {
                         return Ok(());
                     }
+                    if let Some(v) = self.views.last_mut() {
+                        let _ = v.reload();
+                    }
                     continue;
                 }
                 KeyCode::Char('m') => {
@@ -90,6 +93,9 @@ impl App {
                     self.views.pop();
                     if self.views.is_empty() {
                         return Ok(());
+                    }
+                    if let Some(v) = self.views.last_mut() {
+                        let _ = v.reload();
                     }
                 }
                 Ok(ViewAction::Quit) => return Ok(()),
