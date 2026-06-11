@@ -1,0 +1,15 @@
+[package]
+name = "tig-rs"
+version = "0.1.0"
+edition = "2021"
+description = "Text-mode interface for git, in Rust (tig rewrite)"
+license = "GPL-2.0"
+repository = "https://github.com/hermes98761234/tig-rs"
+
+[dependencies]
+ratatui = "0.29"
+anyhow = "1"
+
+[profile.release]
+strip = true
+lto = true
