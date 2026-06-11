@@ -48,6 +48,27 @@ impl App {
                     }
                     continue;
                 }
+                KeyCode::Char('m') => {
+                    match crate::views::main_view::MainView::new(Vec::new()) {
+                        Ok(v) => self.views.push(Box::new(v)),
+                        Err(e) => self.status_msg = format!("error: {e}"),
+                    }
+                    continue;
+                }
+                KeyCode::Char('r') => {
+                    match crate::views::refs::RefsView::new() {
+                        Ok(v) => self.views.push(Box::new(v)),
+                        Err(e) => self.status_msg = format!("error: {e}"),
+                    }
+                    continue;
+                }
+                KeyCode::Char('t') => {
+                    match crate::views::tree::TreeView::new("HEAD", "") {
+                        Ok(v) => self.views.push(Box::new(v)),
+                        Err(e) => self.status_msg = format!("error: {e}"),
+                    }
+                    continue;
+                }
                 _ => {}
             }
 

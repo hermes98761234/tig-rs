@@ -1,6 +1,8 @@
 pub mod diff;
 pub mod main_view;
 pub mod pager;
+pub mod refs;
+pub mod tree;
 
 use anyhow::Result;
 use ratatui::crossterm::event::KeyEvent;
