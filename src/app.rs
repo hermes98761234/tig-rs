@@ -69,6 +69,13 @@ impl App {
                     }
                     continue;
                 }
+                KeyCode::Char('s') => {
+                    match crate::views::status::StatusView::new() {
+                        Ok(v) => self.views.push(Box::new(v)),
+                        Err(e) => self.status_msg = format!("error: {e}"),
+                    }
+                    continue;
+                }
                 _ => {}
             }
 
