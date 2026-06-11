@@ -22,9 +22,8 @@ fn main() -> anyhow::Result<()> {
         std::process::exit(1);
     }
 
-    // Temporary root view until the main view exists (Task 6):
-    let log = tig_rs::git::run_git(&["log", "--oneline", "--decorate", "-100"])?;
-    run_app(Box::new(PagerView::new("log", &log)))
+    let root = tig_rs::views::main_view::MainView::new(Vec::new())?;
+    run_app(Box::new(root))
 }
 
 fn run_app(root: Box<dyn tig_rs::views::View>) -> anyhow::Result<()> {

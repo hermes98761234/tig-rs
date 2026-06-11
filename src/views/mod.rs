@@ -1,3 +1,4 @@
+pub mod main_view;
 pub mod pager;
 
 use anyhow::Result;
